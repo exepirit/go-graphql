@@ -1,0 +1,17 @@
+package app
+
+import (
+	"github.com/exepirit/go-graphql/gqlgen/gql"
+	"github.com/exepirit/go-graphql/gqlgen/internal/api"
+	"github.com/exepirit/go-graphql/gqlgen/internal/config"
+	"github.com/exepirit/go-graphql/gqlgen/internal/infrastructure"
+	"go.uber.org/fx"
+)
+
+var Module = fx.Options(
+	config.Module,
+	infrastructure.Module,
+	gql.Module,
+	api.Module,
+	fx.Invoke(bootstrap),
+)
