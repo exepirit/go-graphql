@@ -7,8 +7,8 @@ exec:
   package: gen
 
 model:
-  filename: internal/api/graphql/gen/models.generated.go
-  package: gen
+  filename: internal/api/graphql/dto/models.generated.go
+  package: dto
 
 resolver:
   layout: follow-schema
@@ -16,7 +16,8 @@ resolver:
   package: graphql
   filename_template: "{name}_resolver.go"
 
-autobind: []
+autobind:
+  - "github.com/exepirit/go-graphql/gqlgen/internal/api/graphql/dto"
 
 # This section declares type mapping between the GraphQL and go type systems
 #
@@ -35,3 +36,7 @@ models:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
       - github.com/99designs/gqlgen/graphql.Int32
+  Todo:
+    fields:
+      user:
+        resolver: true
