@@ -2,17 +2,18 @@ schema:
   - gql/*.graphqls
 
 exec:
-  filename: gql/gen/generated.go
+  layout: follow-schema
+  dir: internal/api/graphql/gen
   package: gen
 
 model:
-  filename: gql/gen/models_gen.go
+  filename: internal/api/graphql/gen/models.generated.go
   package: gen
 
 resolver:
   layout: follow-schema
-  dir: gql
-  package: gql
+  dir: internal/api/graphql
+  package: graphql
   filename_template: "{name}_resolver.go"
 
 autobind: []
