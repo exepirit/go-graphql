@@ -35,20 +35,20 @@ func (repo EntityRepository[T]) Get(ctx context.Context, id uuid.UUID) (T, error
 }
 
 func (repo *EntityRepository[T]) Put(ctx context.Context, entity T) error {
-	_, ok := repo.entities[entity.ID()]
+	_, ok := repo.entities[entity.GetID()]
 	if ok {
 		return errors.New("already exists")
 	}
-	repo.entities[entity.ID()] = entity
+	repo.entities[entity.GetID()] = entity
 	return nil
 }
 
 func (repo *EntityRepository[T]) Update(ctx context.Context, entity T) error {
-	_, ok := repo.entities[entity.ID()]
+	_, ok := repo.entities[entity.GetID()]
 	if !ok {
 		return errors.New("not found")
 	}
-	repo.entities[entity.ID()] = entity
+	repo.entities[entity.GetID()] = entity
 	return nil
 }
 

@@ -15,5 +15,5 @@ type EntityRepository[T Entity] interface {
 }
 
 type Entity interface {
-	ID() uuid.UUID
+	GetID() uuid.UUID
 }
