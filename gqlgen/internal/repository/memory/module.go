@@ -10,4 +10,7 @@ var Module = fx.Options(
 	fx.Provide(func() repository.EntityRepository[models.Todo] {
 		return NewEntityRepository[models.Todo]()
 	}),
+	fx.Provide(func() repository.EntityRepository[models.User] {
+		return NewEntityRepository[models.User]()
+	}),
 )

@@ -7,6 +7,7 @@ import (
 	"github.com/exepirit/go-graphql/gqlgen/internal/models"
 	"github.com/exepirit/go-graphql/gqlgen/internal/repository"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/fx"
 )
 
 // This file will not be regenerated automatically.
@@ -14,18 +15,15 @@ import (
 // It serves as dependency injection for your app, add any dependencies you require here.
 
 type Resolver struct{
-	todosRepository repository.EntityRepository[models.Todo]
+	fx.In
+
+	TodosRepository repository.EntityRepository[models.Todo]
+	UsersRepository repository.EntityRepository[models.User]
 }
 
-func NewResolver(todos repository.EntityRepository[models.Todo]) *Resolver {
-	return &Resolver{
-		todosRepository: todos,
-	}
-}
-
-func NewGraphqlEndpoints(resolvers *Resolver) *GraphqlEndpoints {
+func NewGraphqlEndpoints(resolvers Resolver) *GraphqlEndpoints {
 	gqlServer := handler.NewDefaultServer(gen.NewExecutableSchema(gen.Config{
-		Resolvers: resolvers,
+		Resolvers: &resolvers,
 	}))
 	return &GraphqlEndpoints{
 		Server: gqlServer,

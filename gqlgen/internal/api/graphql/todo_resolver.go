@@ -6,6 +6,7 @@ package graphql
 import (
 	"context"
 	"fmt"
+	"errors"
 
 	"github.com/exepirit/go-graphql/gqlgen/internal/api/graphql/dto"
 	"github.com/exepirit/go-graphql/gqlgen/internal/api/graphql/gen"
@@ -15,13 +16,23 @@ import (
 
 // CreateTodo is the resolver for the createTodo field.
 func (r *mutationResolver) CreateTodo(ctx context.Context, input dto.NewTodo) (*dto.Todo, error) {
+	userId := uuid.MustParse(input.UserID)
+	user, err := r.UsersRepository.Get(ctx, userId)
+	if err != nil {
+		if errors.Is(err, errors.New("not found")) {
+			panic("user not found")
+		}
+		panic(err)
+	}
+
 	todo := models.Todo{
 		ID:   uuid.New(),
 		Text: input.Text,
 		Done: false,
+		UserID: user.ID,
 	}
 
-	err := r.todosRepository.Put(ctx, todo)
+	err = r.TodosRepository.Put(ctx, todo)
 	if err != nil {
 		return nil, err
 	}
@@ -30,13 +41,13 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input dto.NewTodo) (*
 		ID:     todo.ID.String(),
 		Text:   todo.Text,
 		Done:   todo.Done,
-		UserID: "",
+		UserID: todo.UserID.String(),
 	}, nil
 }
 
 // Todos is the resolver for the todos field.
 func (r *queryResolver) Todos(ctx context.Context) ([]*dto.Todo, error) {
-	todos, err := r.todosRepository.GetAll(ctx)
+	todos, err := r.TodosRepository.GetAll(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +58,7 @@ func (r *queryResolver) Todos(ctx context.Context) ([]*dto.Todo, error) {
 			ID:     todo.ID.String(),
 			Text:   todo.Text,
 			Done:   todo.Done,
-			UserID: "",
+			UserID: todo.UserID.String(),
 		}
 	}
 	return dtos, nil
@@ -55,7 +66,15 @@ func (r *queryResolver) Todos(ctx context.Context) ([]*dto.Todo, error) {
 
 // User is the resolver for the user field.
 func (r *todoResolver) User(ctx context.Context, obj *dto.Todo) (*dto.User, error) {
-	panic(fmt.Errorf("not implemented: User - user"))
+	user, err := r.UsersRepository.Get(ctx, uuid.MustParse(obj.UserID))
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.User{
+		ID: user.ID.String(),
+		Name: user.Name,
+	}, nil
 }
 
 // Mutation returns gen.MutationResolver implementation.
