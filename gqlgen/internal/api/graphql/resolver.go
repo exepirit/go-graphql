@@ -35,7 +35,7 @@ type GraphqlEndpoints struct {
 }
 
 func (handler GraphqlEndpoints) Bind(r gin.IRouter) {
-	r.Any("", func(ctx *gin.Context) {
+	r.POST("", func(ctx *gin.Context) {
 		handler.Server.ServeHTTP(ctx.Writer, ctx.Request)
 	})
 }
@@ -49,7 +49,7 @@ type PlaygroundEndpoints struct{}
 func (handler PlaygroundEndpoints) Bind(r gin.IRouter) {
 	h := playground.Handler("ToDo Board", "/graphql")
 
-	r.Any("", func(ctx *gin.Context) {
+	r.GET("", func(ctx *gin.Context) {
 		h.ServeHTTP(ctx.Writer, ctx.Request)
 	})
 }
