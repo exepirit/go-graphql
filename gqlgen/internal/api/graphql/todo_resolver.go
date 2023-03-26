@@ -5,30 +5,36 @@ package graphql
 
 import (
 	"context"
-	"fmt"
 	"errors"
 
 	"github.com/exepirit/go-graphql/gqlgen/internal/api/graphql/dto"
 	"github.com/exepirit/go-graphql/gqlgen/internal/api/graphql/gen"
+	"github.com/exepirit/go-graphql/gqlgen/internal/app/logic"
 	"github.com/exepirit/go-graphql/gqlgen/internal/models"
+	"github.com/exepirit/go-graphql/gqlgen/internal/repository"
 	"github.com/google/uuid"
 )
 
 // CreateTodo is the resolver for the createTodo field.
 func (r *mutationResolver) CreateTodo(ctx context.Context, input dto.NewTodo) (*dto.Todo, error) {
-	userId := uuid.MustParse(input.UserID)
+	userId, _ := uuid.Parse(input.UserID)
 	user, err := r.UsersRepository.Get(ctx, userId)
 	if err != nil {
-		if errors.Is(err, errors.New("not found")) {
-			panic("user not found")
+		switch {
+		case errors.Is(err, repository.ErrNotFound):
+			user = logic.CreateUser()
+			if err := r.UsersRepository.Put(ctx, user); err != nil {
+				panic(err)
+			}
+		default:
+			panic(err)
 		}
-		panic(err)
 	}
 
 	todo := models.Todo{
-		ID:   uuid.New(),
-		Text: input.Text,
-		Done: false,
+		ID:     uuid.New(),
+		Text:   input.Text,
+		Done:   false,
 		UserID: user.ID,
 	}
 
@@ -72,7 +78,7 @@ func (r *todoResolver) User(ctx context.Context, obj *dto.Todo) (*dto.User, erro
 	}
 
 	return &dto.User{
-		ID: user.ID.String(),
+		ID:   user.ID.String(),
 		Name: user.Name,
 	}, nil
 }

@@ -29,7 +29,7 @@ func (repo EntityRepository[T]) GetAll(ctx context.Context) ([]T, error) {
 func (repo EntityRepository[T]) Get(ctx context.Context, id uuid.UUID) (T, error) {
 	entity, ok := repo.entities[id]
 	if !ok {
-		return *(new(T)), errors.New("not found")
+		return *(new(T)), repository.ErrNotFound
 	}
 	return entity, nil
 }
@@ -46,7 +46,7 @@ func (repo *EntityRepository[T]) Put(ctx context.Context, entity T) error {
 func (repo *EntityRepository[T]) Update(ctx context.Context, entity T) error {
 	_, ok := repo.entities[entity.GetID()]
 	if !ok {
-		return errors.New("not found")
+		return repository.ErrNotFound
 	}
 	repo.entities[entity.GetID()] = entity
 	return nil
@@ -55,7 +55,7 @@ func (repo *EntityRepository[T]) Update(ctx context.Context, entity T) error {
 func (repo *EntityRepository[T]) Delete(ctx context.Context, id uuid.UUID) error {
 	_, ok := repo.entities[id]
 	if !ok {
-		return errors.New("not found")
+		return repository.ErrNotFound
 	}
 	delete(repo.entities, id)
 	return nil
