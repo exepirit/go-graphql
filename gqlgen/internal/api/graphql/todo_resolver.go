@@ -9,7 +9,7 @@ import (
 
 	"github.com/exepirit/go-graphql/gqlgen/internal/api/graphql/dto"
 	"github.com/exepirit/go-graphql/gqlgen/internal/api/graphql/gen"
-	"github.com/exepirit/go-graphql/gqlgen/internal/app/logic"
+	"github.com/exepirit/go-graphql/gqlgen/internal/app/command"
 	"github.com/exepirit/go-graphql/gqlgen/internal/models"
 	"github.com/exepirit/go-graphql/gqlgen/internal/repository"
 	"github.com/google/uuid"
@@ -18,12 +18,12 @@ import (
 // CreateTodo is the resolver for the createTodo field.
 func (r *mutationResolver) CreateTodo(ctx context.Context, input dto.NewTodo) (*dto.Todo, error) {
 	userId, _ := uuid.Parse(input.UserID)
-	user, err := r.UsersRepository.Get(ctx, userId)
+	_, err := r.UsersRepository.Get(ctx, userId)
 	if err != nil {
 		switch {
 		case errors.Is(err, repository.ErrNotFound):
-			user = logic.CreateUser()
-			if err := r.UsersRepository.Put(ctx, user); err != nil {
+			userId, err = r.Commands.CreateUser.Execute(ctx, command.CreateUserArgs{})
+			if err != nil {
 				panic(err)
 			}
 		default:
@@ -35,7 +35,7 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input dto.NewTodo) (*
 		ID:     uuid.New(),
 		Text:   input.Text,
 		Done:   false,
-		UserID: user.ID,
+		UserID: userId,
 	}
 
 	err = r.TodosRepository.Put(ctx, todo)

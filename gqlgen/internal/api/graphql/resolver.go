@@ -4,6 +4,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/exepirit/go-graphql/gqlgen/internal/api/graphql/gen"
+	"github.com/exepirit/go-graphql/gqlgen/internal/app/command"
 	"github.com/exepirit/go-graphql/gqlgen/internal/models"
 	"github.com/exepirit/go-graphql/gqlgen/internal/repository"
 	"github.com/gin-gonic/gin"
@@ -17,6 +18,7 @@ import (
 type Resolver struct{
 	fx.In
 
+	Commands *command.Commands
 	TodosRepository repository.EntityRepository[models.Todo]
 	UsersRepository repository.EntityRepository[models.User]
 }
