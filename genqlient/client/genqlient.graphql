@@ -1,0 +1,19 @@
+query GetTodos() {
+  todos {
+    id
+    text
+    done
+    user {
+      id
+      name
+    }
+  }
+}
+
+mutation CreateTodo($input: NewTodo!) {
+  createTodo(input: $input) {
+    id
+    text
+    done
+  }
+}
