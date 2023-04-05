@@ -18,7 +18,7 @@ import (
 type Resolver struct{
 	fx.In
 
-	Commands *command.Commands
+	Commands command.Commands
 	TodosRepository repository.EntityRepository[models.Todo]
 	UsersRepository repository.EntityRepository[models.User]
 }
